@@ -1,6 +1,5 @@
-import copy
-import itertools
 import os
+import re
 import sys
 from getpass import getpass
 from typing import Optional
@@ -8,7 +7,7 @@ from typing import Optional
 import click
 import keyring
 from click import UsageError
-from lark import Lark, Transformer, Token
+from lark import Lark, Transformer
 from lark.reconstruct import Reconstructor
 from openai import OpenAI
 
@@ -73,10 +72,22 @@ def render(messages):
 @click.command
 @click.argument("filename", required=False)
 @click.option("--reverse", "-r", help="Reverse the conversation in the editor", is_flag=True, default=False)
-def main(filename: Optional[str], reverse: bool):
+@click.option("--assume-yes", "-y", help='Automatic yes to prompts; assume "yes" as answer to all prompts and run non-interactively.', is_flag=True, default=False)
+@click.option("--assume-no", "-n", help='Automatic no to prompts; assume "no" as answer to all prompts and run non-interactively.', is_flag=True, default=False)
+def main(filename: Optional[str], reverse: bool, assume_yes: bool, assume_no: bool):
     """
     Starts a session with the chatbot, resume by providing FILENAME
     """
+    if assume_yes and assume_no:
+        raise UsageError("--assume-yes and --assume-no are mutually exclusive")
+
+    prompt_user = not assume_no and not assume_yes
+
+    if sys.stdin.isatty() and not sys.stdout.isatty():
+        raise UsageError("STDOUT must not be TTY when STDIN is TTY")
+
+    if not sys.stdin.isatty() and prompt_user:
+        raise UsageError("Must use -y or -n when STDIN is not TTY")
 
     api_key = keyring.get_password("openai", "api_key")
     if not api_key:
@@ -126,13 +137,36 @@ def main(filename: Optional[str], reverse: bool):
     )
     content = response.choices[0].message.content
     role = response.choices[0].message.role
+
     messages.append({"role": role, "content": content})
 
-    if filename:
+    print(content)
+
+    if prompt_user:
+        save = click.confirm("Save response?", default=True)
+    elif assume_yes:
+        save = True
+    else:
+        save = False
+
+    if not filename and save:
+        request.append({"role": "user", "content": "Given the conversation so far, summarize it in just 4 words. Only respond with these 4 words"})
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=request,
+        )
+        content = response.choices[0].message.content
+        filename: str = content.strip()
+        filename = filename.lower()
+        filename = filename.replace(' ', '-')
+        filename = re.sub(r"[^A-Za-z0-9\-]", "", filename)
+        filename = f'{filename}.md'
+
+    if filename and save:
         with open(filename, "w") as f:
             f.write(render(messages))
+        print(f"Saved to {filename}", file=sys.stderr)
 
-    print(content)
 
 if __name__ == "__main__":
     main()
