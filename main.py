@@ -15,6 +15,8 @@ from output import render, generate_filename
 from output.markdown import Renderer
 from parser import parse
 
+DEFAULT_SESSION_HISTORY_FILE = ".dotchatbot-history"
+
 def get_api_key(service_name: ServiceName) -> str:
     api_key = keyring.get_password(service_name.lower(), "api_key")
     if not api_key:
@@ -33,6 +35,7 @@ def get_api_key(service_name: ServiceName) -> str:
     option("--reverse", "-r", help="Reverse the conversation in the editor", is_flag=True, default=False),
     option("--assume-yes", "-y", help='Automatic yes to prompts; assume "yes" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
     option("--assume-no", "-n", help='Automatic no to prompts; assume "no" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
+    option("--session-history-file", help="The file where the session history is stored", default=DEFAULT_SESSION_HISTORY_FILE),
 )
 @option_group(
     "Markdown options",
@@ -56,9 +59,11 @@ def main(
         markdown_hyperlinks: bool,
         markdown_inline_code_lexer: str,
         markdown_inline_code_theme: str,
+        session_history_file: str,
     ) -> None:
     """
-    Starts a session with the chatbot, resume by providing FILENAME
+    Starts a session with the chatbot, resume by providing FILENAME.
+    Provide - for FILENAME to use the previous session (stored in LAST_SESSION_FILE).
     """
     if assume_yes and assume_no:
         raise UsageError("--assume-yes and --assume-no are mutually exclusive")
@@ -77,6 +82,17 @@ def main(
                                  markdown_inline_code_lexer, markdown_inline_code_theme)
 
     messages = []
+    if filename == "-":
+        if os.path.exists(session_history_file):
+            with open(session_history_file, "r") as f:
+                lines = f.readlines()
+                if lines:
+                    filename = lines[-1].strip()
+                else:
+                    filename = None
+        else:
+            filename = None
+
     if filename and os.path.exists(filename):
         with open(filename, "r") as f:
             messages = parse(f.read())
@@ -107,6 +123,7 @@ def main(
         if no_pager or not sys.stdout.isatty():
             click.echo(output)
         else:
+            click.echo(output)
             click.echo_via_pager(output, color=True)
 
     if prompt_user:
@@ -122,7 +139,9 @@ def main(
     if filename and save:
         with open(filename, "w") as f:
             f.write(render(messages))
+            session_file_absolute_path = os.path.abspath(f.name)
         click.echo(f"Saved to {filename}", file=sys.stderr)
+        open(session_history_file, "a").write(session_file_absolute_path + "\n")
 
 
 if __name__ == "__main__":
