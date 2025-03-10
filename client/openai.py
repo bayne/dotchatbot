@@ -4,8 +4,8 @@ import openai
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionSystemMessageParam, \
     ChatCompletionAssistantMessageParam, ChatCompletionUserMessageParam
 
-from client.service_client import ServiceClient
 from parser.transformer import Message
+from client import ServiceClient
 
 SupportedChatCompletionType = ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam | ChatCompletionAssistantMessageParam
 
@@ -33,7 +33,7 @@ class OpenAI(ServiceClient):
         super().__init__()
         self.client = openai.OpenAI(api_key = api_key)
 
-    def create_chat_completion(self, messages: list[Message]) -> list[Message]:
+    def create_chat_completion(self, messages: list[Message]) -> Message:
         request: Iterable[Message] = [
             Message(role="system", content="You are a helpful assistant."),
             *messages,
@@ -50,5 +50,4 @@ class OpenAI(ServiceClient):
         if not content:
             raise ValueError("Empty response")
 
-        messages.append(Message(role=role, content=content))
-        return messages
+        return Message(role=role, content=content)
