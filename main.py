@@ -8,7 +8,11 @@ from typing import Optional, List, Any, Iterable
 import click
 import keyring
 from click import UsageError
+from click_extra import extra_command
+from cloup import option_group, option
 from lark import Lark
+from rich.console import Console, JustifyMethod
+from rich.markdown import Markdown
 from typing_extensions import Buffer
 
 from client.client_registry import ServiceName, create_client
@@ -67,13 +71,66 @@ def render(messages: List[Message]) -> str:
     result = map(lambda message: f"@@> {message.role}:\n{message.content.strip()}", messages)
     return "\n\n".join(result) + "\n\n"
 
-@click.command
+def rich_print(
+        output: str,
+        no_pager: bool,
+        markdown_justify: JustifyMethod,
+        markdown_code_theme: str,
+        markdown_hyperlinks: bool,
+        markdown_inline_code_lexer: str,
+        markdown_inline_code_theme: str,
+    ):
+    markdown = Markdown(
+        output,
+        justify=markdown_justify,
+        code_theme=markdown_code_theme,
+        hyperlinks=markdown_hyperlinks,
+        inline_code_lexer=markdown_inline_code_lexer,
+        inline_code_theme=markdown_inline_code_theme,
+    )
+    console = Console()
+    if no_pager:
+        console.print(markdown)
+    else:
+        with console.capture() as capture:
+            console.print(markdown)
+        click.echo_via_pager(capture.get(), color=True)
+
+@extra_command
 @click.argument("filename", required=False)
-@click.option("--service-name", "-s", help="The chatbot provider service name", default="OpenAI")
-@click.option("--reverse", "-r", help="Reverse the conversation in the editor", is_flag=True, default=False)
-@click.option("--assume-yes", "-y", help='Automatic yes to prompts; assume "yes" as answer to all prompts and run non-interactively.', is_flag=True, default=False)
-@click.option("--assume-no", "-n", help='Automatic no to prompts; assume "no" as answer to all prompts and run non-interactively.', is_flag=True, default=False)
-def main(filename: Optional[str], service_name: ServiceName, reverse: bool, assume_yes: bool, assume_no: bool) -> None:
+@option_group(
+    "Options",
+    option("--service-name", "-s", help="The chatbot provider service name", default="OpenAI"),
+    option("--re-edit", "-e", is_flag=True, help="Open the response immediately in the editor", default=False),
+    option("--no-pager", is_flag=True, help="Do not output using pager", default=False),
+    option("--no-rich", is_flag=True, help="Do not output using rich", default=False),
+    option("--reverse", "-r", help="Reverse the conversation in the editor", is_flag=True, default=False),
+    option("--assume-yes", "-y", help='Automatic yes to prompts; assume "yes" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
+    option("--assume-no", "-n", help='Automatic no to prompts; assume "no" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
+)
+@option_group(
+    "Markdown options",
+    option("--markdown-justify", default="default"),
+    option("--markdown-code-theme", default="monokai"),
+    option("--markdown-hyperlinks"),
+    option("--markdown-inline-code-lexer"),
+    option("--markdown-inline-code-theme"),
+)
+def main(
+        filename: Optional[str],
+        service_name: ServiceName,
+        re_edit: bool,
+        no_pager: bool,
+        no_rich: bool,
+        reverse: bool,
+        assume_yes: bool,
+        assume_no: bool,
+        markdown_justify: JustifyMethod,
+        markdown_code_theme: str,
+        markdown_hyperlinks: bool,
+        markdown_inline_code_lexer: str,
+        markdown_inline_code_theme: str,
+    ) -> None:
     """
     Starts a session with the chatbot, resume by providing FILENAME
     """
@@ -102,8 +159,14 @@ def main(filename: Optional[str], service_name: ServiceName, reverse: bool, assu
         raise UsageError("Aborting request due to empty message")
 
     messages = client.create_chat_completion(messages)
+    output = messages[-1].content
 
-    print(messages[-1].content)
+    if not re_edit:
+        if no_rich or not sys.stdout.isatty():
+            print(output)
+        else:
+            rich_print(output, no_pager, markdown_justify, markdown_code_theme, markdown_hyperlinks,
+                       markdown_inline_code_lexer, markdown_inline_code_theme)
 
     if prompt_user:
         save = click.confirm("Save response?", default=True)
@@ -128,4 +191,4 @@ def main(filename: Optional[str], service_name: ServiceName, reverse: bool, assu
 
 
 if __name__ == "__main__":
-    main()
+    main(auto_envvar_prefix="DOTCHATBOT")
