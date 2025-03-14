@@ -89,6 +89,7 @@ def main(
                 lines = f.readlines()
                 if lines:
                     filename = lines[-1].strip()
+                    click.echo(f"Resuming from previous session: {filename}", file=sys.stderr)
                 else:
                     filename = None
         else:
