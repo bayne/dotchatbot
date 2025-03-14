@@ -30,7 +30,6 @@ def get_api_key(service_name: ServiceName) -> str:
 @option_group(
     "Options",
     option("--service-name", "-s", help="The chatbot provider service name", default="OpenAI"),
-    option("--re-edit", "-e", is_flag=True, help="Open the response immediately in the editor", default=False),
     option("--no-pager", is_flag=True, help="Do not output using pager", default=False),
     option("--no-rich", is_flag=True, help="Do not output using rich", default=False),
     option("--reverse", "-r", help="Reverse the conversation in the editor", is_flag=True, default=False),
@@ -50,7 +49,6 @@ def get_api_key(service_name: ServiceName) -> str:
 def main(
         filename: Optional[str],
         service_name: ServiceName,
-        re_edit: bool,
         no_pager: bool,
         no_rich: bool,
         reverse: bool,
@@ -117,17 +115,16 @@ def main(
     chatbot_response = client.create_chat_completion(messages)
     messages.append(chatbot_response)
 
-    if not re_edit:
-        if no_rich or not sys.stdout.isatty():
-            output = chatbot_response.content
-        else:
-            output = markdown_renderer.render(chatbot_response)
+    if no_rich or not sys.stdout.isatty():
+        output = chatbot_response.content
+    else:
+        output = markdown_renderer.render(chatbot_response)
 
-        if no_pager or not sys.stdout.isatty():
-            click.echo(output)
-        else:
-            click.echo(output)
-            click.echo_via_pager(output, color=True)
+    if no_pager or not sys.stdout.isatty():
+        click.echo(output)
+    else:
+        click.echo(output)
+        click.echo_via_pager(output, color=True)
 
     if prompt_user:
         save = click.confirm("Save response?", default=True)
