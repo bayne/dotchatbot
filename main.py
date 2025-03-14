@@ -101,11 +101,11 @@ def main(
 
     if sys.stdin.isatty():
         if not reverse:
-            file_content = click.edit(text=f"{render(messages)}@@> user:\n\n")
+            file_content = click.edit(text=f"{render(messages)}@@> user:\n\n", extension=".md")
             messages = parse(file_content)
         else:
             reversed_messages_from_file = list(reversed(messages))
-            file_content = click.edit(text=f"@@> user:\n\n{render(reversed_messages_from_file)}")
+            file_content = click.edit(text=f"@@> user:\n\n{render(reversed_messages_from_file)}", extension=".md")
             messages = list(reversed(parse(file_content)))
     else:
         messages = [*messages, *parse(sys.stdin.read())]
