@@ -17,6 +17,7 @@ from parser import parse
 
 DEFAULT_SUMMARY_PROMPT = "Given the conversation so far, summarize it in just 4 words. Only respond with these 4 words"
 DEFAULT_SESSION_HISTORY_FILE = ".dotchatbot-history"
+DEFAULT_SESSION_FILE_EXT= ".dcb"
 
 def get_api_key(service_name: ServiceName) -> str:
     api_key = keyring.get_password(service_name.lower(), "api_key")
@@ -36,6 +37,7 @@ def get_api_key(service_name: ServiceName) -> str:
     option("--assume-yes", "-y", help='Automatic yes to prompts; assume "yes" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
     option("--assume-no", "-n", help='Automatic no to prompts; assume "no" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
     option("--session-history-file", help="The file where the session history is stored", default=DEFAULT_SESSION_HISTORY_FILE),
+    option("--session-file-ext", help="The extension to use for session files", default=DEFAULT_SESSION_FILE_EXT),
     option("--summary-prompt", help="The prompt to use for the summary (for building the filename for the session)", default=DEFAULT_SUMMARY_PROMPT),
 )
 @option_group(
@@ -60,6 +62,7 @@ def main(
         markdown_inline_code_lexer: str,
         markdown_inline_code_theme: str,
         session_history_file: str,
+        session_file_ext: str,
         summary_prompt: str,
     ) -> None:
     """
@@ -101,11 +104,11 @@ def main(
 
     if sys.stdin.isatty():
         if not reverse:
-            file_content = click.edit(text=f"{render(messages)}@@> user:\n\n", extension=".md")
+            file_content = click.edit(text=f"{render(messages)}@@> user:\n\n", extension=session_file_ext)
             messages = parse(file_content)
         else:
             reversed_messages_from_file = list(reversed(messages))
-            file_content = click.edit(text=f"@@> user:\n\n{render(reversed_messages_from_file)}", extension=".md")
+            file_content = click.edit(text=f"@@> user:\n\n{render(reversed_messages_from_file)}", extension=session_file_ext)
             messages = list(reversed(parse(file_content)))
     else:
         messages = [*messages, *parse(sys.stdin.read())]
