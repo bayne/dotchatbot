@@ -15,6 +15,7 @@ from output import render, generate_filename
 from output.markdown import Renderer
 from parser import parse
 
+DEFAULT_SUMMARY_PROMPT = "Given the conversation so far, summarize it in just 4 words. Only respond with these 4 words"
 DEFAULT_SESSION_HISTORY_FILE = ".dotchatbot-history"
 
 def get_api_key(service_name: ServiceName) -> str:
@@ -36,6 +37,7 @@ def get_api_key(service_name: ServiceName) -> str:
     option("--assume-yes", "-y", help='Automatic yes to prompts; assume "yes" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
     option("--assume-no", "-n", help='Automatic no to prompts; assume "no" as answer to all prompts and run non-interactively.', is_flag=True, default=False),
     option("--session-history-file", help="The file where the session history is stored", default=DEFAULT_SESSION_HISTORY_FILE),
+    option("--summary-prompt", help="The prompt to use for the summary (for building the filename for the session)", default=DEFAULT_SUMMARY_PROMPT),
 )
 @option_group(
     "Markdown options",
@@ -60,6 +62,7 @@ def main(
         markdown_inline_code_lexer: str,
         markdown_inline_code_theme: str,
         session_history_file: str,
+        summary_prompt: str,
     ) -> None:
     """
     Starts a session with the chatbot, resume by providing FILENAME.
@@ -134,7 +137,7 @@ def main(
         save = False
 
     if not filename and save:
-        filename = generate_filename(client, messages)
+        filename = generate_filename(client, summary_prompt, messages)
 
     if filename and save:
         with open(filename, "w") as f:

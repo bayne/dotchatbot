@@ -22,8 +22,8 @@ def _hash_messages(messages: list[Message], length: int = 5) -> str:
     checksum = zlib.crc32(data) & 0xffffffff
     return format(checksum, 'x').zfill(length)[:length]
 
-def generate_filename(client: ServiceClient, messages: List[Message]) -> str:
-    summarize_prompt = Message(role="user", content="Given the conversation so far, summarize it in just 4 words. Only respond with these 4 words")
+def generate_filename(client: ServiceClient, summary_prompt: str, messages: List[Message]) -> str:
+    summarize_prompt = Message(role="user", content=summary_prompt)
     content = client.create_chat_completion([*messages, summarize_prompt]).content
     filename = content.strip()
     filename = filename.lower()
