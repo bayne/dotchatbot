@@ -4,8 +4,8 @@ import openai
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionSystemMessageParam, \
     ChatCompletionAssistantMessageParam, ChatCompletionUserMessageParam
 
-from parser.transformer import Message
-from client import ServiceClient
+from dotchatbot.parser import Message
+from dotchatbot.client import ServiceClient
 
 SupportedChatCompletionType = ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam | ChatCompletionAssistantMessageParam
 

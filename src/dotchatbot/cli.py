@@ -10,10 +10,10 @@ from click_extra import extra_command
 from cloup import option_group, option
 from rich.console import JustifyMethod
 
-from client import ServiceName, create_client
-from output import render, generate_filename
-from output.markdown import Renderer
-from parser import parse
+from dotchatbot.client import ServiceName, create_client
+from dotchatbot.output import render, generate_filename
+from dotchatbot.output.markdown import Renderer
+from dotchatbot.parser import parse
 
 DEFAULT_SUMMARY_PROMPT = "Given the conversation so far, summarize it in just 4 words. Only respond with these 4 words"
 DEFAULT_SESSION_HISTORY_FILE = ".dotchatbot-history"

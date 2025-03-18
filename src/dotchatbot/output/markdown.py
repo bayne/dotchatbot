@@ -1,7 +1,7 @@
 from rich.console import JustifyMethod, Console
 from rich.markdown import Markdown
 
-from parser.transformer import Message
+from dotchatbot.parser.transformer import Message
 
 class Renderer:
     def __init__(self,

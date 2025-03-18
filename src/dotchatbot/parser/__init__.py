@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from lark import Lark
 
-from parser.transformer import SectionTransformer, Message
+from dotchatbot.parser.transformer import SectionTransformer, Message
 
 GRAMMAR = """
     start: section+

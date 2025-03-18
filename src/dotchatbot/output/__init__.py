@@ -3,8 +3,8 @@ import zlib
 from typing import Callable, List, Iterable
 from typing_extensions import Buffer
 
-from client import ServiceClient
-from parser.transformer import Message
+from dotchatbot.client import ServiceClient
+from dotchatbot.parser.transformer import Message
 
 OutputRenderer = Callable[[List[Message]], str]
 
@@ -31,4 +31,3 @@ def generate_filename(client: ServiceClient, summary_prompt: str, messages: List
     filename = re.sub(r"[^A-Za-z0-9\-]", "", filename)
     return f'{filename}-{_hash_messages(messages)}.md'
 
-import output.markdown

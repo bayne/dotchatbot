@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import List, Literal
+from typing import List
 
-from parser.transformer import Message
+from dotchatbot.parser import Message
 from typing import Literal
 
 ServiceName = Literal[
@@ -18,4 +18,4 @@ def create_client(service_name: ServiceName, api_key: str) -> ServiceClient:
     else:
         raise ValueError(f"Invalid service name: {service_name}")
 
-from client.openai import OpenAI
+from dotchatbot.client.openai import OpenAI
