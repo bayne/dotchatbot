@@ -1,74 +1,34 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "dotchatbot"
-dynamic = ["version"]
-description = ''
-readme = "README.md"
-requires-python = ">=3.8"
-license = "MIT"
-keywords = []
+version = "0.1.0"
+description = "Chatbot CLI"
 authors = [
-  { name = "Brian Payne", email = "bwpayne@gmail.com" },
+    { name="Brian Payne", email="bwpayne@gmail.com" }
 ]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
-]
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
 dependencies = [
-  "click ~= 8.1.8",
-  "keyring ~= 25.6.0",
+  "click",
+  "keyring",
   "click_extra",
-  "rich ~= 13.9.4",
-  "lark ~= 1.2.2",
-  "openai ~= 1.66.3",
+  "rich",
+  "lark",
+  "openai",
 ]
 
+[tool.setuptools]
+packages = { find = { where = ["src"] } }
+
 [project.urls]
-Documentation = "https://github.com/bayne/dotchatbot#readme"
-Issues = "https://github.com/bayne/dotchatbot/issues"
-Source = "https://github.com/bayne/dotchatbot"
+"Homepage" = "https://github.com/bayne/dotchatbot"
 
 [project.scripts]
 dcb = "dotchatbot.cli:main"
 
-[tool.hatch.version]
-path = "src/dotchatbot/__about__.py"
-
-[tool.hatch.envs.types]
-extra-dependencies = [
-  "mypy>=1.0.0",
-]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/dotchatbot tests}"
-
-[tool.coverage.run]
-source_pkgs = ["dotchatbot", "tests"]
-branch = true
-parallel = true
-omit = [
-  "src/dotchatbot/__about__.py",
-]
-
-[tool.coverage.paths]
-dotchatbot = ["src/dotchatbot", "*/dotchatbot/src/dotchatbot"]
-tests = ["tests", "*/dotchatbot/tests"]
-
-[tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
 [tool.mypy]
 allow_redefinition = true
 disallow_untyped_defs = true
