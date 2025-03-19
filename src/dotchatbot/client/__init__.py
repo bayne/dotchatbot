@@ -2,20 +2,11 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from dotchatbot.parser import Message
-from typing import Literal
 
-ServiceName = Literal[
-    "OpenAI",]
 
 class ServiceClient(ABC):
-    def __init__(self) -> None: ...
+    def __init__(self, system_prompt: str) -> None:
+        self.system_prompt = system_prompt
+
     @abstractmethod
     def create_chat_completion(self, messages: List[Message]) -> Message: ...
-
-def create_client(service_name: ServiceName, api_key: str) -> ServiceClient:
-    if service_name == "OpenAI":
-        return OpenAI(api_key=api_key)
-    else:
-        raise ValueError(f"Invalid service name: {service_name}")
-
-from dotchatbot.client.openai import OpenAI

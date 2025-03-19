@@ -28,6 +28,7 @@ GRAMMAR = """
 parser = Lark(GRAMMAR, parser='lalr')
 transformer = SectionTransformer()
 
+
 def parse(document: Optional[str]) -> List[Message]:
     if not document or not document.strip():
         return []

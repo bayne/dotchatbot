@@ -27,7 +27,7 @@ packages = { find = { where = ["src"] } }
 "Homepage" = "https://github.com/bayne/dotchatbot"
 
 [project.scripts]
-dcb = "dotchatbot.cli:main"
+dcb = "main:main"
 
 [tool.mypy]
 allow_redefinition = true

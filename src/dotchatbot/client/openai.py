@@ -1,15 +1,22 @@
 from typing import Iterable
 
 import openai
-from openai.types.chat import ChatCompletionMessageParam, ChatCompletionSystemMessageParam, \
-    ChatCompletionAssistantMessageParam, ChatCompletionUserMessageParam
+from openai.types.chat import ChatCompletionMessageParam
+from openai.types.chat import ChatCompletionSystemMessageParam
+from openai.types.chat import ChatCompletionAssistantMessageParam
+from openai.types.chat import ChatCompletionUserMessageParam
 
-from dotchatbot.parser import Message
 from dotchatbot.client import ServiceClient
+from dotchatbot.parser import Message
 
-SupportedChatCompletionType = ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam | ChatCompletionAssistantMessageParam
+SupportedChatCompletionType = (ChatCompletionSystemMessageParam
+                               | ChatCompletionUserMessageParam
+                               | ChatCompletionAssistantMessageParam)
 
-def _chat_completion_message_param(message: Message) -> SupportedChatCompletionType:
+
+def _chat_completion_message_param(
+        message: Message
+) -> SupportedChatCompletionType:
     if message.role == "system":
         return ChatCompletionSystemMessageParam(
             content=message.content,
@@ -28,17 +35,21 @@ def _chat_completion_message_param(message: Message) -> SupportedChatCompletionT
     else:
         raise ValueError(f"Invalid role: {message.role}")
 
+
 class OpenAI(ServiceClient):
-    def __init__(self, api_key: str):
-        super().__init__()
-        self.client = openai.OpenAI(api_key = api_key)
+    def __init__(self, system_prompt: str, api_key: str):
+        super().__init__(system_prompt=system_prompt)
+        self.client = openai.OpenAI(api_key=api_key)
 
     def create_chat_completion(self, messages: list[Message]) -> Message:
         request: Iterable[Message] = [
-            Message(role="system", content="You are a helpful assistant."),
+            Message(role="system", content=self.system_prompt),
             *messages,
         ]
-        request: Iterable[ChatCompletionMessageParam] = map(_chat_completion_message_param, request)
+        request: Iterable[ChatCompletionMessageParam] = map(
+            _chat_completion_message_param,
+            request
+        )
         request: Iterable[ChatCompletionMessageParam] = list(request)
         response = self.client.chat.completions.create(
             model="gpt-4o",

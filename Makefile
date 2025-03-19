@@ -53,9 +53,3 @@ test:
 lint:
 	$(PIP) install flake8
 	flake8 $(SRC_DIR)
-
-# Setup a virtual environment (if needed)
-.PHONY: venv
-venv:
-	python3 -m venv venv
-	source venv/bin/activate && $(PIP) install --upgrade pip

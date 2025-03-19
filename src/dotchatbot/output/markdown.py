@@ -3,6 +3,7 @@ from rich.markdown import Markdown
 
 from dotchatbot.parser.transformer import Message
 
+
 class Renderer:
     def __init__(self,
                  markdown_justify: JustifyMethod,
