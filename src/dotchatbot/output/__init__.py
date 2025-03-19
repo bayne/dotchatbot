@@ -46,4 +46,4 @@ def generate_filename(
     filename = filename.lower()
     filename = filename.replace(' ', '-')
     filename = re.sub(r"[^A-Za-z0-9\-]", "", filename)
-    return f'{filename}-{_hash_messages(messages)}.{extension}'
+    return f'{filename}-{_hash_messages(messages)}{extension}'

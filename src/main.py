@@ -34,7 +34,7 @@ DEFAULT_SESSION_FILE_LOCATION = os.path.join(
     "sessions"
 )
 os.makedirs(DEFAULT_SESSION_FILE_LOCATION, exist_ok=True)
-DEFAULT_SESSION_FILE_EXT = "dcb"
+DEFAULT_SESSION_FILE_EXT = ".dcb"
 
 
 def get_api_key(service_name: ServiceName) -> str:
