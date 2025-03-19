@@ -11,7 +11,7 @@ from cloup import option_group, option
 from rich.console import JustifyMethod
 
 from dotchatbot.client.services import ServiceName, create_client
-from dotchatbot.output import render, generate_filename
+from dotchatbot.output.file import generate_file_content, generate_filename
 from dotchatbot.output.markdown import Renderer
 from dotchatbot.parser import parse
 
@@ -211,15 +211,17 @@ def main(
 
     if sys.stdin.isatty():
         if not reverse:
+            file_content = generate_file_content(messages)
             file_content = click.edit(
-                text=f"{render(messages)}@@> user:\n\n",
+                text=f"{file_content}@@> user:\n\n",
                 extension=session_file_ext
             )
             messages = parse(file_content)
         else:
             reversed_messages_from_file = list(reversed(messages))
+            file_content = generate_file_content(reversed_messages_from_file)
             file_content = click.edit(
-                text=f"@@> user:\n\n{render(reversed_messages_from_file)}",
+                text=f"@@> user:\n\n{file_content}",
                 extension=session_file_ext
             )
             messages = list(reversed(parse(file_content)))
@@ -265,7 +267,7 @@ def main(
 
     if filename and save:
         with open(filename, "w") as f:
-            f.write(render(messages))
+            f.write(generate_file_content(messages))
             session_file_absolute_path = os.path.abspath(f.name)
         click.echo(f"Saved to {filename}", file=sys.stderr)
         open(session_history_file, "a").write(

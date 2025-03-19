@@ -7,10 +7,11 @@ from typing_extensions import Buffer
 from dotchatbot.client import ServiceClient
 from dotchatbot.parser.transformer import Message
 
+
 OutputRenderer = Callable[[List[Message]], str]
 
 
-def render(messages: List[Message]) -> str:
+def generate_file_content(messages: List[Message]) -> str:
     if not messages:
         return ""
     result = map(
