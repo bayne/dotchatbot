@@ -38,8 +38,6 @@ Usage: dcb [OPTIONS] [FILENAME]
   FILENAME to use the previous session (stored in SESSION_HISTORY_FILE).
 
 Options:
-  -s, --service-name TEXT       The chatbot provider service name  [default:
-                                OpenAI]
   -p, --system-prompt TEXT      The default system prompt to use  [default: You
                                 are a helpful assistant.]
   --no-pager                    Do not output using pager
@@ -64,7 +62,8 @@ Options:
                                 the filename for the session)  [default: Given
                                 the conversation so far, summarize it in just 4
                                 words. Only respond with these 4 words]
-
+  -s, --service-name TEXT       The chatbot provider service name  [default:
+                                OpenAI]
 OpenAI options:
   --openai-model     [default: gpt-4o]
 

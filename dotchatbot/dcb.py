@@ -55,11 +55,6 @@ def get_api_key(service_name: ServiceName) -> str:
 @option_group(
     "Options",
     option(
-        "--service-name", "-s",
-        help="The chatbot provider service name",
-        default="OpenAI"
-    ),
-    option(
         "--system-prompt", "-p",
         help="The default system prompt to use",
         default=DEFAULT_SYSTEM_PROMPT
@@ -132,6 +127,11 @@ The prompt to use for the summary (for building the filename for the session)\
 """,
         default=DEFAULT_SUMMARY_PROMPT
     ),
+    option(
+        "--service-name", "-s",
+        help="The chatbot provider service name",
+        default="OpenAI"
+    ),
 )
 @option_group(
     "OpenAI options",
@@ -155,7 +155,6 @@ The prompt to use for the summary (for building the filename for the session)\
 )
 def main(
     filename: Optional[str],
-    service_name: ServiceName,
     system_prompt: str,
     no_pager: bool,
     no_rich: bool,
@@ -167,6 +166,7 @@ def main(
     session_file_location: str,
     session_file_ext: str,
     summary_prompt: str,
+    service_name: ServiceName,
     openai_model: ChatModel,
     markdown_justify: JustifyMethod,
     markdown_code_theme: str,
