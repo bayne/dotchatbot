@@ -36,5 +36,5 @@ class Parser:
     def parse(self, document: Optional[str]) -> List[Message]:
         if not document or not document.strip():
             return []
-        tree = self.lark.parse(document)
+        tree = self.lark.parse(document.lstrip())
         return self.transformer.transform(tree)

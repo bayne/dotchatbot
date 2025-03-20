@@ -50,9 +50,9 @@ test:
 # Lint the code (example using flake8)
 .PHONY: lint
 lint:
-	flake8 $(SRC_DIR)
+	flake8 .
 
 # Use mypy to check type hints
 .PHONY: check
 check:
-	MYPYPATH=src mypy --namespace-packages --explicit-package-bases .
+	mypy --namespace-packages --explicit-package-bases .
