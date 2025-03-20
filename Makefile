@@ -60,3 +60,7 @@ check:
 .PHONY: publish-test
 publish-test:
 	python -m twine upload --verbose --repository testpypi dist/*
+
+.PHONY: publish
+publish:
+	python -m twine upload --verbose --repository pypi dist/*
