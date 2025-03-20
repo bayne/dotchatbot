@@ -2,7 +2,6 @@ SHELL := /bin/bash
 
 PYTHON=python
 PIP=pip
-SRC_DIR=src
 PACKAGE_NAME=dotchatbot
 ENTRY_COMMAND=dcb
 
@@ -20,15 +19,10 @@ install:
 build:
 	$(PYTHON) -m build
 
-# Install development dependencies if specified (example)
-.PHONY: install-dev
-install-dev:
-	$(PIP) install -r requirements.txt -r requirements-dev.txt
-
 # Run the main script
 .PHONY: run
 run:
-	$(PYTHON) $(SRC_DIR)/dotchatbot/cli.py
+	$(PYTHON) dotchatbot/dcb.py
 
 # Run the script via the entry point command
 .PHONY: entry
