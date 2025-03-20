@@ -56,3 +56,7 @@ lint:
 .PHONY: check
 check:
 	mypy --namespace-packages --explicit-package-bases .
+
+.PHONY: publish-test
+publish-test:
+	python -m twine upload --verbose --repository testpypi dist/*
