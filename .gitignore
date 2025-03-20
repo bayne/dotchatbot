@@ -1,5 +1,5 @@
 __pycache__
 venv
 .dotchatbot-history
-.idea
 **/*.egg-info
+dist/

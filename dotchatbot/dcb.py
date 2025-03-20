@@ -1,19 +1,24 @@
 import os
 import sys
 from getpass import getpass
-from typing import Optional, get_args
+from typing import get_args
+from typing import Optional
 
 import click
 import keyring
 from click import UsageError
 from click_extra import extra_command
-from cloup import option_group, option
+from cloup import option
+from cloup import option_group
+from openai.types import ChatModel
 from rich.console import JustifyMethod
 
-from dotchatbot.client.services import ServiceName, create_client
-from dotchatbot.output.file import generate_file_content, generate_filename
+from dotchatbot.client.factory import create_client
+from dotchatbot.client.factory import ServiceName
+from dotchatbot.output.file import generate_file_content
+from dotchatbot.output.file import generate_filename
 from dotchatbot.output.markdown import Renderer
-from dotchatbot.parser import parse
+from dotchatbot.input.parser import Parser
 
 APP_NAME = "dotchatbot"
 os.makedirs(click.get_app_dir(APP_NAME), exist_ok=True)
@@ -86,7 +91,8 @@ Automatic yes to prompts; \
 assume "yes" as answer to all prompts and run non-interactively.\
 ''',
         is_flag=True,
-        default=False),
+        default=False
+    ),
     option(
         "--assume-no",
         "-n",
@@ -128,6 +134,14 @@ The prompt to use for the summary (for building the filename for the session)\
     ),
 )
 @option_group(
+    "OpenAI options",
+    option(
+        "--openai-model",
+        default="gpt-4o",
+        type=click.Choice(get_args(ChatModel)),
+    )
+)
+@option_group(
     "Markdown options",
     option(
         "--markdown-justify",
@@ -140,24 +154,25 @@ The prompt to use for the summary (for building the filename for the session)\
     option("--markdown-inline-code-theme"),
 )
 def main(
-        filename: Optional[str],
-        service_name: ServiceName,
-        system_prompt: str,
-        no_pager: bool,
-        no_rich: bool,
-        reverse: bool,
-        assume_yes: bool,
-        assume_no: bool,
-        current_directory: bool,
-        session_history_file: str,
-        session_file_location: str,
-        session_file_ext: str,
-        summary_prompt: str,
-        markdown_justify: JustifyMethod,
-        markdown_code_theme: str,
-        markdown_hyperlinks: bool,
-        markdown_inline_code_lexer: str,
-        markdown_inline_code_theme: str,
+    filename: Optional[str],
+    service_name: ServiceName,
+    system_prompt: str,
+    no_pager: bool,
+    no_rich: bool,
+    reverse: bool,
+    assume_yes: bool,
+    assume_no: bool,
+    current_directory: bool,
+    session_history_file: str,
+    session_file_location: str,
+    session_file_ext: str,
+    summary_prompt: str,
+    openai_model: ChatModel,
+    markdown_justify: JustifyMethod,
+    markdown_code_theme: str,
+    markdown_hyperlinks: bool,
+    markdown_inline_code_lexer: str,
+    markdown_inline_code_theme: str,
 ) -> None:
     """
     Starts a session with the chatbot, resume by providing FILENAME.
@@ -179,7 +194,8 @@ def main(
     client = create_client(
         service_name=service_name,
         system_prompt=system_prompt,
-        api_key=api_key
+        api_key=api_key,
+        openai_model=openai_model,
     )
     markdown_renderer = Renderer(
         markdown_justify,
@@ -205,9 +221,11 @@ def main(
         else:
             filename = None
 
+    parser = Parser()
+
     if filename and os.path.exists(filename):
         with open(filename, "r") as f:
-            messages = parse(f.read())
+            messages = parser.parse(f.read())
 
     if sys.stdin.isatty():
         if not reverse:
@@ -216,7 +234,7 @@ def main(
                 text=f"{file_content}@@> user:\n\n",
                 extension=session_file_ext
             )
-            messages = parse(file_content)
+            messages = parser.parse(file_content)
         else:
             reversed_messages_from_file = list(reversed(messages))
             file_content = generate_file_content(reversed_messages_from_file)
@@ -224,12 +242,14 @@ def main(
                 text=f"@@> user:\n\n{file_content}",
                 extension=session_file_ext
             )
-            messages = list(reversed(parse(file_content)))
+            messages = list(reversed(parser.parse(file_content)))
     else:
-        messages = [*messages, *parse(sys.stdin.read())]
+        messages = [*messages, *parser.parse(sys.stdin.read())]
 
-    if (not messages or not messages[-1].content.strip()
-            or messages[-1].role != "user"):
+    is_empty_message = (not messages
+                        or not messages[-1].content.strip()
+                        or messages[-1].role != "user")
+    if is_empty_message:
         raise UsageError("Aborting request due to empty message")
 
     chatbot_response = client.create_chat_completion(messages)
@@ -261,7 +281,7 @@ def main(
             session_file_ext
         )
         if current_directory:
-            filename = os.path.join(".", filename)
+            filename = os.path.join(os.curdir, filename)
         else:
             filename = os.path.join(session_file_location, filename)
 

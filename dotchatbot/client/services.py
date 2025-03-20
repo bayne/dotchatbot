@@ -1,7 +1,9 @@
+from typing import Literal, List
+from dotchatbot.input.transformer import Message
 from abc import ABC, abstractmethod
-from typing import List
 
-from dotchatbot.parser import Message
+ServiceName = Literal[
+    "OpenAI",]
 
 
 class ServiceClient(ABC):

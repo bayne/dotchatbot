@@ -1,12 +1,13 @@
 import re
 import zlib
-from typing import Callable, List, Iterable
+from typing import Callable
+from typing import Iterable
+from typing import List
 
 from typing_extensions import Buffer
 
-from dotchatbot.client import ServiceClient
-from dotchatbot.parser.transformer import Message
-
+from dotchatbot.client.services import ServiceClient
+from dotchatbot.input.transformer import Message
 
 OutputRenderer = Callable[[List[Message]], str]
 
@@ -22,8 +23,8 @@ def generate_file_content(messages: List[Message]) -> str:
 
 
 def _hash_messages(
-        messages: list[Message],
-        length: int = 5
+    messages: list[Message],
+    length: int = 5
 ) -> str:
     data: Iterable = list(messages)
     data = map(lambda m: m.content, data)
@@ -34,10 +35,10 @@ def _hash_messages(
 
 
 def generate_filename(
-        client: ServiceClient,
-        summary_prompt: str,
-        messages: List[Message],
-        extension: str
+    client: ServiceClient,
+    summary_prompt: str,
+    messages: List[Message],
+    extension: str
 ) -> str:
     summarize_prompt = Message(role="user", content=summary_prompt)
     content = client.create_chat_completion(

@@ -45,11 +45,14 @@ clean:
 # Run tests (example using pytest)
 .PHONY: test
 test:
-	$(PIP) install pytest
 	pytest tests/
 
 # Lint the code (example using flake8)
 .PHONY: lint
 lint:
-	$(PIP) install flake8
 	flake8 $(SRC_DIR)
+
+# Use mypy to check type hints
+.PHONY: check
+check:
+	MYPYPATH=src mypy --namespace-packages --explicit-package-bases .

@@ -20,14 +20,11 @@ dependencies = [
   "openai",
 ]
 
-[tool.setuptools]
-packages = { find = { where = ["src"] } }
-
 [project.urls]
 "Homepage" = "https://github.com/bayne/dotchatbot"
 
 [project.scripts]
-dcb = "main:main"
+dcb = "dotchatbot.dcb:main"
 
 [tool.mypy]
 allow_redefinition = true

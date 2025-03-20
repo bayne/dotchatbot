@@ -1,13 +1,14 @@
 from typing import Iterable
 
 import openai
+from openai.types import ChatModel
+from openai.types.chat import ChatCompletionAssistantMessageParam
 from openai.types.chat import ChatCompletionMessageParam
 from openai.types.chat import ChatCompletionSystemMessageParam
-from openai.types.chat import ChatCompletionAssistantMessageParam
 from openai.types.chat import ChatCompletionUserMessageParam
 
-from dotchatbot.client import ServiceClient
-from dotchatbot.parser import Message
+from dotchatbot.client.services import ServiceClient
+from dotchatbot.input.transformer import Message
 
 SupportedChatCompletionType = (ChatCompletionSystemMessageParam
                                | ChatCompletionUserMessageParam
@@ -15,7 +16,7 @@ SupportedChatCompletionType = (ChatCompletionSystemMessageParam
 
 
 def _chat_completion_message_param(
-        message: Message
+    message: Message
 ) -> SupportedChatCompletionType:
     if message.role == "system":
         return ChatCompletionSystemMessageParam(
@@ -37,8 +38,14 @@ def _chat_completion_message_param(
 
 
 class OpenAI(ServiceClient):
-    def __init__(self, system_prompt: str, api_key: str):
+    def __init__(
+        self,
+        system_prompt: str,
+        api_key: str,
+        model: ChatModel
+    ):
         super().__init__(system_prompt=system_prompt)
+        self.model = model
         self.client = openai.OpenAI(api_key=api_key)
 
     def create_chat_completion(self, messages: list[Message]) -> Message:
@@ -52,7 +59,7 @@ class OpenAI(ServiceClient):
         )
         request: Iterable[ChatCompletionMessageParam] = list(request)
         response = self.client.chat.completions.create(
-            model="gpt-4o",
+            model=self.model,
             messages=request,
         )
         content = response.choices[0].message.content

@@ -1,7 +1,13 @@
 from dataclasses import dataclass
-from typing import List, Tuple, TypeGuard, Literal, get_args
+from typing import get_args
+from typing import List
+from typing import Literal
+from typing import Tuple
+from typing import TypeGuard
 
-from lark import Transformer, Tree, Token
+from lark import Token
+from lark import Transformer
+from lark import Tree
 
 Role = Literal["system", "user", "assistant"]
 
@@ -23,7 +29,7 @@ def _join(items: List[Tree | str]) -> str:
 
 
 def _section_type_guard(
-        items: List[List[Tree | str]]
+    items: List[List[Tree | str]]
 ) -> TypeGuard[List[Tuple[Role, Tree]]]:
     return all(
         map(
