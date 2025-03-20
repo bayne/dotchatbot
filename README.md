@@ -3,7 +3,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/dotchatbot.svg)](https://pypi.org/project/dotchatbot)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dotchatbot.svg)](https://pypi.org/project/dotchatbot)
 
-A practitioners approach of working with chat-based LLMs
+A CLI tool for a file-based interface for ChatGPT
 
 ![Demo of dotchatbot](demo.gif)
 
