@@ -50,22 +50,25 @@ Options:
   -c, --current-directory       Use the current directory as the session file
                                 location
   --session-history-file TEXT   The file where the session history is stored
-                                [default:
-                                /home/bpayne/.config/dotchatbot/.dotchatbot-
-                                history]
+                                [default: ~/.config/dotchatbot/.dotchatbot-history]
   --session-file-location TEXT  The location where session files are stored
-                                [default:
-                                /home/bpayne/.config/dotchatbot/sessions]
+                                [default: ~/.config/dotchatbot/sessions]
   --session-file-ext TEXT       The extension to use for session files
                                 [default: .dcb]
   --summary-prompt TEXT         The prompt to use for the summary (for building
                                 the filename for the session)  [default: Given
                                 the conversation so far, summarize it in just 4
                                 words. Only respond with these 4 words]
-  -s, --service-name TEXT       The chatbot provider service name  [default:
+  -s, --service-name            [OpenAI|Anthropic]
+                                The chatbot provider service name  [default:
                                 OpenAI]
+
 OpenAI options:
-  --openai-model     [default: gpt-4o]
+  --openai-model TEXT [default: gpt-4o]
+
+Anthropic options:
+  --anthropic-model TEXT          [default: claude-3-7-sonnet-latest]
+  --anthropic-max-tokens INTEGER  [default: 1024]
 
 Markdown options:
   --markdown-justify [default|left|center|right|full]
@@ -83,7 +86,7 @@ Other options:
                             [default: color]
   -C, --config CONFIG_PATH  Location of the configuration file. Supports glob
                             pattern of local path and remote URL.  [default:
-                            ~/.config/dcb/*.{toml,yaml,yml,json,ini,xml}]
+                            ~/.config/dotchatbot/*.{toml,yaml,yml,json,ini,xml}]
   --show-params             Show all CLI parameters, their provenance, defaults
                             and value, then exit.
   --verbosity LEVEL         Either CRITICAL, ERROR, WARNING, INFO, DEBUG.

@@ -6,6 +6,7 @@ from typing import Optional
 
 import click
 import keyring
+from anthropic.types import ModelParam
 from click import UsageError
 from click_extra import extra_command
 from cloup import option
@@ -130,7 +131,8 @@ The prompt to use for the summary (for building the filename for the session)\
     option(
         "--service-name", "-s",
         help="The chatbot provider service name",
-        default="OpenAI"
+        default="OpenAI",
+        type=click.Choice(get_args(ServiceName)),
     ),
 )
 @option_group(
@@ -140,6 +142,18 @@ The prompt to use for the summary (for building the filename for the session)\
         default="gpt-4o",
         type=click.Choice(get_args(ChatModel)),
     )
+)
+@option_group(
+    "Anthropic options",
+    option(
+        "--anthropic-model",
+        default="claude-3-7-sonnet-latest",
+    ),
+    option(
+        "--anthropic-max-tokens",
+        default=1024,
+        type=int,
+    ),
 )
 @option_group(
     "Markdown options",
@@ -168,6 +182,8 @@ def main(
     summary_prompt: str,
     service_name: ServiceName,
     openai_model: ChatModel,
+    anthropic_model: ModelParam,
+    anthropic_max_tokens: int,
     markdown_justify: JustifyMethod,
     markdown_code_theme: str,
     markdown_hyperlinks: bool,
@@ -177,7 +193,7 @@ def main(
     """
     Starts a session with the chatbot, resume by providing FILENAME.
     Provide - for FILENAME to use the previous session
-    (stored in LAST_SESSION_FILE).
+    (stored in SESSION_HISTORY_FILE).
     """
     if assume_yes and assume_no:
         raise UsageError("--assume-yes and --assume-no are mutually exclusive")
@@ -196,6 +212,8 @@ def main(
         system_prompt=system_prompt,
         api_key=api_key,
         openai_model=openai_model,
+        anthropic_model=anthropic_model,
+        anthropic_max_tokens=anthropic_max_tokens,
     )
     markdown_renderer = Renderer(
         markdown_justify,

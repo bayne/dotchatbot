@@ -45,8 +45,8 @@ def test_dcb_invalid_service_name(
 ) -> None:
     """Test invalid service name fails."""
     result = runner.invoke(main, ["--service-name", "InvalidService", "-y"])
-    assert result.exit_code != 0
-    assert "Invalid service name" in str(result.exception)
+    assert result.exit_code == 2
+    assert "Invalid value for '--service-name" in str(result.output)
 
 
 @patch('dotchatbot.dcb.get_api_key')
@@ -78,7 +78,9 @@ def test_dcb_valid_execution(
             service_name='OpenAI',
             system_prompt='You are a helpful assistant.',
             api_key='fake_api_key',
-            openai_model='gpt-4o'
+            openai_model='gpt-4o',
+            anthropic_model='claude-3-7-sonnet-latest',
+            anthropic_max_tokens=1024
         )
 
 

@@ -4,6 +4,7 @@ PYTHON=python
 PIP=pip
 PACKAGE_NAME=dotchatbot
 ENTRY_COMMAND=dcb
+RUN_ARGS=
 
 # Default target
 .PHONY: all
@@ -22,9 +23,8 @@ build:
 # Run the main script
 .PHONY: run
 run:
-	$(PYTHON) dotchatbot/dcb.py
+	$(PYTHON) dotchatbot/dcb.py $(RUN_ARGS)
 
-# Run the script via the entry point command
 .PHONY: entry
 entry:
 	$(ENTRY_COMMAND)
