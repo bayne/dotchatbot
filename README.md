@@ -31,11 +31,11 @@ pipx install dotchatbot
 
 ## Usage
 
-```
+```usage
 Usage: dcb [OPTIONS] [FILENAME]
 
-  Starts a session with the chatbot, resume by providing FILENAME. Provide - for
-  FILENAME to use the previous session (stored in SESSION_HISTORY_FILE).
+  Starts a session with the chatbot, resume by providing FILENAME. Provide -
+  for FILENAME to use the previous session (stored in SESSION_HISTORY_FILE).
 
 Options:
   -p, --system-prompt TEXT      The default system prompt to use  [default: You
@@ -43,32 +43,32 @@ Options:
   --no-pager                    Do not output using pager
   --no-rich                     Do not output using rich
   -r, --reverse                 Reverse the conversation in the editor
-  -y, --assume-yes              Automatic yes to prompts; assume "yes" as answer
-                                to all prompts and run non-interactively.
+  -y, --assume-yes              Automatic yes to prompts; assume "yes" as
+                                answer to all prompts and run non-
+                                interactively.
   -n, --assume-no               Automatic no to prompts; assume "no" as answer
                                 to all prompts and run non-interactively.
   -c, --current-directory       Use the current directory as the session file
                                 location
   --session-history-file TEXT   The file where the session history is stored
-                                [default: ~/.config/dotchatbot/.dotchatbot-history]
   --session-file-location TEXT  The location where session files are stored
-                                [default: ~/.config/dotchatbot/sessions]
   --session-file-ext TEXT       The extension to use for session files
                                 [default: .dcb]
   --summary-prompt TEXT         The prompt to use for the summary (for building
                                 the filename for the session)  [default: Given
                                 the conversation so far, summarize it in just 4
                                 words. Only respond with these 4 words]
-  -s, --service-name            [OpenAI|Anthropic]
+  -s, --service-name [OpenAI|Anthropic]
                                 The chatbot provider service name  [default:
                                 OpenAI]
+  -H, --history                 Print history of sessions
 
 OpenAI options:
-  --openai-model TEXT [default: gpt-4o]
+  --openai-model TEXT  [default: gpt-4o]
 
 Anthropic options:
   --anthropic-model TEXT          [default: claude-3-7-sonnet-latest]
-  --anthropic-max-tokens INTEGER  [default: 1024]
+  --anthropic-max-tokens INTEGER  [default: 16384]
 
 Markdown options:
   --markdown-justify [default|left|center|right|full]
@@ -79,11 +79,11 @@ Markdown options:
   --markdown-inline-code-theme TEXT
 
 Other options:
-  --time / --no-time        Measure and print elapsed execution time.  [default:
-                            no-time]
+  --time / --no-time        Measure and print elapsed execution time.
+                            [default: no-time]
   --color, --ansi / --no-color, --no-ansi
-                            Strip out all colors and all ANSI codes from output.
-                            [default: color]
+                            Strip out all colors and all ANSI codes from
+                            output.  [default: color]
   -C, --config CONFIG_PATH  Location of the configuration file. Supports glob
                             pattern of local path and remote URL.  [default:
                             ~/.config/dotchatbot/*.{toml,yaml,yml,json,ini,xml}]

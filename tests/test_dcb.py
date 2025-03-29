@@ -10,7 +10,7 @@ def runner() -> CliRunner:
     return CliRunner()
 
 
-@patch('dotchatbot.dcb.get_api_key')
+@patch('dotchatbot.dcb._get_api_key')
 @patch('dotchatbot.client.factory.create_client')
 def test_dcb_no_arguments_should_fail(
     mock_create_client: MagicMock,
@@ -23,7 +23,7 @@ def test_dcb_no_arguments_should_fail(
     assert "Error" in result.output
 
 
-@patch('dotchatbot.dcb.get_api_key')
+@patch('dotchatbot.dcb._get_api_key')
 @patch('dotchatbot.client.factory.create_client')
 def test_dcb_help_option(
     mock_create_client: MagicMock,
@@ -36,7 +36,7 @@ def test_dcb_help_option(
     assert "Usage:" in result.output
 
 
-@patch('dotchatbot.dcb.get_api_key')
+@patch('dotchatbot.dcb._get_api_key')
 @patch('dotchatbot.client.factory.create_client')
 def test_dcb_invalid_service_name(
     mock_create_client: MagicMock,
@@ -49,7 +49,7 @@ def test_dcb_invalid_service_name(
     assert "Invalid value for '--service-name" in str(result.output)
 
 
-@patch('dotchatbot.dcb.get_api_key')
+@patch('dotchatbot.dcb._get_api_key')
 @patch('dotchatbot.dcb.create_client')
 def test_dcb_valid_execution(
     mock_create_client: MagicMock,
@@ -80,11 +80,11 @@ def test_dcb_valid_execution(
             api_key='fake_api_key',
             openai_model='gpt-4o',
             anthropic_model='claude-3-7-sonnet-latest',
-            anthropic_max_tokens=1024
+            anthropic_max_tokens=16384
         )
 
 
-@patch('dotchatbot.dcb.get_api_key')
+@patch('dotchatbot.dcb._get_api_key')
 @patch('dotchatbot.client.factory.create_client')
 def test_dcb_assume_yes_and_no_fails(
     mock_create_client: MagicMock,
@@ -98,7 +98,7 @@ def test_dcb_assume_yes_and_no_fails(
             result.output)
 
 
-@patch('dotchatbot.dcb.get_api_key')
+@patch('dotchatbot.dcb._get_api_key')
 @patch('dotchatbot.dcb.create_client')
 @patch('os.path.exists', return_value=True)
 @patch(

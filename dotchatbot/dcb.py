@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 from getpass import getpass
 from typing import get_args
 from typing import Optional
@@ -37,18 +38,32 @@ DEFAULT_SESSION_HISTORY_FILE = os.path.join(
 )
 DEFAULT_SESSION_FILE_LOCATION = os.path.join(
     click.get_app_dir(APP_NAME),
-    "sessions"
+    "sessions",
+    datetime.now().date().isoformat(),
 )
 os.makedirs(DEFAULT_SESSION_FILE_LOCATION, exist_ok=True)
 DEFAULT_SESSION_FILE_EXT = ".dcb"
 
 
-def get_api_key(service_name: ServiceName) -> str:
+def _get_api_key(service_name: ServiceName) -> str:
     api_key = keyring.get_password(service_name.lower(), "api_key")
     if not api_key:
         api_key = getpass(f"Enter your {service_name} API key: ")
         keyring.set_password(service_name.lower(), "api_key", api_key)
     return api_key
+
+
+def _print_history(session_history_file: str) -> None:
+    with open(session_history_file, "r") as f:
+        previous = ''
+        for line in f:
+            filename = line.strip()
+            if os.path.exists(filename):
+                mtime = os.path.getmtime(filename)
+                mtime = datetime.fromtimestamp(mtime)
+                if previous != filename:
+                    click.echo(f"{mtime} {filename}")
+                    previous = filename
 
 
 @extra_command
@@ -109,12 +124,14 @@ assume "no" as answer to all prompts and run non-interactively.\
     option(
         "--session-history-file",
         help="The file where the session history is stored",
-        default=DEFAULT_SESSION_HISTORY_FILE
+        default=DEFAULT_SESSION_HISTORY_FILE,
+        show_default=False,
     ),
     option(
         "--session-file-location",
         help="The location where session files are stored",
-        default=DEFAULT_SESSION_FILE_LOCATION
+        default=DEFAULT_SESSION_FILE_LOCATION,
+        show_default=False,
     ),
     option(
         "--session-file-ext",
@@ -134,13 +151,18 @@ The prompt to use for the summary (for building the filename for the session)\
         default="OpenAI",
         type=click.Choice(get_args(ServiceName)),
     ),
+    option(
+        "--history", "-H",
+        help="Print history of sessions",
+        is_flag=True,
+        default=False
+    ),
 )
 @option_group(
     "OpenAI options",
     option(
         "--openai-model",
         default="gpt-4o",
-        type=click.Choice(get_args(ChatModel)),
     )
 )
 @option_group(
@@ -151,7 +173,7 @@ The prompt to use for the summary (for building the filename for the session)\
     ),
     option(
         "--anthropic-max-tokens",
-        default=1024,
+        default=16384,
         type=int,
     ),
 )
@@ -180,6 +202,7 @@ def main(
     session_file_location: str,
     session_file_ext: str,
     summary_prompt: str,
+    history: bool,
     service_name: ServiceName,
     openai_model: ChatModel,
     anthropic_model: ModelParam,
@@ -195,6 +218,10 @@ def main(
     Provide - for FILENAME to use the previous session
     (stored in SESSION_HISTORY_FILE).
     """
+    if history:
+        _print_history(session_history_file)
+        return
+
     if assume_yes and assume_no:
         raise UsageError("--assume-yes and --assume-no are mutually exclusive")
 
@@ -206,7 +233,7 @@ def main(
     if not sys.stdin.isatty() and prompt_user:
         raise UsageError("Must use -y or -n when STDIN is not TTY")
 
-    api_key = get_api_key(service_name)
+    api_key = _get_api_key(service_name)
     client = create_client(
         service_name=service_name,
         system_prompt=system_prompt,
