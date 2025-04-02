@@ -20,7 +20,7 @@ class Renderer:
             code_theme=markdown_code_theme,
             hyperlinks=markdown_hyperlinks,
             inline_code_lexer=markdown_inline_code_lexer,
-            inline_code_theme=markdown_inline_code_theme,
+            inline_code_theme=markdown_inline_code_theme
         )
         self.console = Console()
 

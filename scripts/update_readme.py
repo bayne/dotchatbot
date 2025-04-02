@@ -1,11 +1,9 @@
-import sys
 import re
+import sys
 from pathlib import Path
 
 
 def update_readme(usage_text: str) -> None:
-    usage_text = usage_text.replace("dcb.py", "dcb")
-    usage_text = usage_text.replace("config/dcb", "config/dotchatbot")
     readme_path = Path('README.md')
     readme_content = readme_path.read_text()
     updated_content = re.sub(

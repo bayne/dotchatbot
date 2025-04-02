@@ -32,7 +32,7 @@ pipx install dotchatbot
 ## Usage
 
 ```usage
-Usage: dcb [OPTIONS] [FILENAME]
+Usage: dotchatbot [OPTIONS] [FILENAME]
 
   Starts a session with the chatbot, resume by providing FILENAME. Provide -
   for FILENAME to use the previous session (stored in SESSION_HISTORY_FILE).
@@ -79,16 +79,14 @@ Markdown options:
   --markdown-inline-code-theme TEXT
 
 Other options:
-  --time / --no-time        Measure and print elapsed execution time.
-                            [default: no-time]
+  -C, --config CONFIG_PATH  Location of the configuration file. Supports glob
+                            pattern of local path and remote URL.  [default: ~/
+                            .config/dotchatbot/*.{toml,yaml,yml,json,ini,xml}]
+  --show-params             Show all CLI parameters, their provenance, defaults
+                            and value, then exit.
   --color, --ansi / --no-color, --no-ansi
                             Strip out all colors and all ANSI codes from
                             output.  [default: color]
-  -C, --config CONFIG_PATH  Location of the configuration file. Supports glob
-                            pattern of local path and remote URL.  [default:
-                            ~/.config/dotchatbot/*.{toml,yaml,yml,json,ini,xml}]
-  --show-params             Show all CLI parameters, their provenance, defaults
-                            and value, then exit.
   --verbosity LEVEL         Either CRITICAL, ERROR, WARNING, INFO, DEBUG.
                             [default: WARNING]
   -v, --verbose             Increase the default WARNING verbosity by one level

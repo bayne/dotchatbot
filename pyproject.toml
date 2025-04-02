@@ -30,7 +30,8 @@ classifiers = [
 "Homepage" = "https://github.com/bayne/dotchatbot"
 
 [project.scripts]
-dcb = "dotchatbot.dcb:main"
+dcb = "dotchatbot.dcb:dotchatbot"
+dotchatbot = "dotchatbot.dcb:dotchatbot"
 
 [tool.mypy]
 allow_redefinition = true

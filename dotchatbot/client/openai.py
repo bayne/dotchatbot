@@ -10,9 +10,9 @@ from openai.types.chat import ChatCompletionUserMessageParam
 from dotchatbot.client.services import ServiceClient
 from dotchatbot.input.transformer import Message
 
-SupportedChatCompletionType = (ChatCompletionSystemMessageParam
-                               | ChatCompletionUserMessageParam
-                               | ChatCompletionAssistantMessageParam)
+SupportedChatCompletionType = (
+    ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam |
+    ChatCompletionAssistantMessageParam)
 
 
 def _chat_completion_message_param(
@@ -20,18 +20,15 @@ def _chat_completion_message_param(
 ) -> SupportedChatCompletionType:
     if message.role == "system":
         return ChatCompletionSystemMessageParam(
-            content=message.content,
-            role="system"
+            content=message.content, role="system"
         )
     elif message.role == "user":
         return ChatCompletionUserMessageParam(
-            content=message.content,
-            role="user"
+            content=message.content, role="user"
         )
     elif message.role == "assistant":
         return ChatCompletionAssistantMessageParam(
-            content=message.content,
-            role="assistant"
+            content=message.content, role="assistant"
         )
     else:
         raise ValueError(f"Invalid role: {message.role}")
@@ -39,10 +36,7 @@ def _chat_completion_message_param(
 
 class OpenAI(ServiceClient):
     def __init__(
-        self,
-        system_prompt: str,
-        api_key: str,
-        model: ChatModel
+        self, system_prompt: str, api_key: str, model: ChatModel
     ):
         super().__init__(system_prompt=system_prompt)
         self.model = model
@@ -50,17 +44,13 @@ class OpenAI(ServiceClient):
 
     def create_chat_completion(self, messages: list[Message]) -> Message:
         request: Iterable[Message] = [
-            Message(role="system", content=self.system_prompt),
-            *messages,
-        ]
+            Message(role="system", content=self.system_prompt), *messages, ]
         request: Iterable[ChatCompletionMessageParam] = map(
-            _chat_completion_message_param,
-            request
+            _chat_completion_message_param, request
         )
         request: Iterable[ChatCompletionMessageParam] = list(request)
         response = self.client.chat.completions.create(
-            model=self.model,
-            messages=request,
+            model=self.model, messages=request
         )
         content = response.choices[0].message.content
         role = response.choices[0].message.role

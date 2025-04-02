@@ -1,9 +1,9 @@
 import re
-import zlib
 from typing import Callable
 from typing import Iterable
 from typing import List
 
+import zlib
 from typing_extensions import Buffer
 
 from dotchatbot.client.services import ServiceClient
@@ -23,8 +23,7 @@ def generate_file_content(messages: List[Message]) -> str:
 
 
 def _hash_messages(
-    messages: list[Message],
-    length: int = 5
+    messages: list[Message], length: int = 5
 ) -> str:
     data: Iterable = list(messages)
     data = map(lambda m: m.content, data)

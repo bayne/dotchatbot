@@ -53,12 +53,9 @@ class SectionTransformer(Transformer):
         )
         if not _section_type_guard(items):
             raise TypeError("Invalid section")
-        return [
-            Message(
-                role=role,
-                content=_join(content.children)
-            ) for role, content in items
-        ]
+        return [Message(
+            role=role, content=_join(content.children)
+        ) for role, content in items]
 
     def header(self, items: List[Token]) -> List[str]:
         return [i.value for i in items if i.type == "ROLE"][0]

@@ -11,7 +11,7 @@ def parser() -> Parser:
 
 
 @mark.parametrize(
-    "input,expected",
+    "content,expected",
     [
         (
             "",
@@ -50,5 +50,5 @@ def parser() -> Parser:
         )
     ]
 )
-def test_parser(parser: Parser, input: str, expected:  list[Message]) -> None:
-    assert parser.parse(input) == expected
+def test_parser(parser: Parser, content: str, expected: list[Message]) -> None:
+    assert parser.parse(content) == expected

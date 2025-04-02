@@ -1,9 +1,11 @@
-from typing import Literal, List
-from dotchatbot.input.transformer import Message
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
+from typing import List
+from typing import Literal
 
-ServiceName = Literal[
-    "OpenAI",]
+from dotchatbot.input.transformer import Message
+
+ServiceName = Literal["OpenAI",]
 
 
 class ServiceClient(ABC):

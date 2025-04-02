@@ -1,7 +1,9 @@
 from typing import Iterable
 
 import anthropic
-from anthropic.types import ModelParam, MessageParam, TextBlock
+from anthropic.types import MessageParam
+from anthropic.types import ModelParam
+from anthropic.types import TextBlock
 
 from dotchatbot.client.services import ServiceClient
 from dotchatbot.input.transformer import Message
@@ -12,13 +14,11 @@ def _message_param(
 ) -> MessageParam:
     if message.role == "user":
         return MessageParam(
-            content=message.content,
-            role="user"
+            content=message.content, role="user"
         )
     elif message.role == "assistant":
         return MessageParam(
-            content=message.content,
-            role="assistant"
+            content=message.content, role="assistant"
         )
     else:
         raise ValueError(f"Invalid role: {message.role}")
@@ -30,7 +30,7 @@ class Anthropic(ServiceClient):
         system_prompt: str,
         api_key: str,
         max_tokens: int,
-        model: ModelParam,
+        model: ModelParam
     ):
         super().__init__(system_prompt=system_prompt)
         self.model = model
@@ -39,13 +39,10 @@ class Anthropic(ServiceClient):
 
     def create_chat_completion(self, messages: list[Message]) -> Message:
         messages: Iterable[MessageParam] = map(
-            _message_param,
-            messages
+            _message_param, messages
         )
         response = self.client.messages.create(
-            max_tokens=self.max_tokens,
-            messages=messages,
-            model=self.model,
+            max_tokens=self.max_tokens, messages=messages, model=self.model
         )
         if not response.content or type(response.content[0]) is not TextBlock:
             raise ValueError(
