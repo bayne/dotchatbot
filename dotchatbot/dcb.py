@@ -323,7 +323,7 @@ def dotchatbot(
         result = click.prompt(
             "Save response?",
             default="Y",
-            type=Choice(["y", "n", "c"]),
+            type=Choice(["y", "n", "c"], case_sensitive=False),
             show_choices=True
         )
         save = result.lower() in ("y", "yes", "c")
