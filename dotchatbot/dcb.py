@@ -8,7 +8,9 @@ from typing import Optional
 import click
 import keyring
 from anthropic.types import ModelParam
+from click import Choice
 from click import UsageError
+from click._termui_impl import Editor
 from click_extra import ColorOption
 from click_extra import ConfigOption
 from click_extra import extra_command
@@ -26,6 +28,7 @@ from dotchatbot.client.factory import ServiceName
 from dotchatbot.input.parser import Parser
 from dotchatbot.output.file import generate_file_content
 from dotchatbot.output.file import generate_filename
+from dotchatbot.output.file import NEW_USER_MESSAGE
 from dotchatbot.output.markdown import Renderer
 
 APP_NAME = "dotchatbot"
@@ -46,6 +49,20 @@ DEFAULT_SESSION_FILE_LOCATION = os.path.join(
 )
 os.makedirs(DEFAULT_SESSION_FILE_LOCATION, exist_ok=True)
 DEFAULT_SESSION_FILE_EXT = ".dcb"
+
+
+def _edit(text: str, extension: str, reverse: bool) -> Optional[str]:
+    editor = Editor().get_editor()
+    print(editor)
+    if editor in ("vim", "vi"):
+        line_offset = 2 if reverse else ""
+        editor += f" +{line_offset}"
+    file_content = click.edit(
+        editor=editor,
+        text=text,
+        extension=extension,
+    )
+    return file_content
 
 
 def _get_api_key(service_name: ServiceName) -> str:
@@ -76,7 +93,9 @@ def _print_history(session_history_file: str) -> None:
         ColorOption(),
         VerbosityOption(),
         VerboseOption(),
-        ExtraVersionOption()
+        ExtraVersionOption(
+            package_name=APP_NAME
+        )
     ]
 )
 @click.argument("filename", required=False)
@@ -260,15 +279,19 @@ def dotchatbot(
     if sys.stdin.isatty():
         if not reverse:
             file_content = generate_file_content(messages)
-            file_content = click.edit(
-                text=f"{file_content}@@> user:\n\n", extension=session_file_ext
+            file_content = _edit(
+                text=f"{file_content}{NEW_USER_MESSAGE}",
+                extension=session_file_ext,
+                reverse=reverse
             )
             messages = parser.parse(file_content)
         else:
             reversed_messages_from_file = list(reversed(messages))
             file_content = generate_file_content(reversed_messages_from_file)
-            file_content = click.edit(
-                text=f"@@> user:\n\n{file_content}", extension=session_file_ext
+            file_content = _edit(
+                text=f"{NEW_USER_MESSAGE}{file_content}",
+                extension=session_file_ext,
+                reverse=reverse
             )
             messages = list(reversed(parser.parse(file_content)))
     else:
@@ -297,7 +320,14 @@ def dotchatbot(
         click.echo_via_pager(output, color=True)
 
     if prompt_user:
-        save = click.confirm("Save response?", default=True)
+        result = click.prompt(
+            "Save response?",
+            default="Y",
+            type=Choice(["y", "n", "c"]),
+            show_choices=True
+        )
+        save = result.lower() in ("y", "yes", "c")
+        current_directory = current_directory or result.lower() == "c"
     elif assume_yes:
         save = True
     else:

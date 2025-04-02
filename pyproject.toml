@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 readme = "README.md"
 name = "dotchatbot"
-version = "0.1.6"
+version = "0.2.0"
 description = "Chatbot CLI"
 authors = [
     { name="Brian Payne", email="bwpayne@gmail.com" }
@@ -36,3 +36,5 @@ dotchatbot = "dotchatbot.dcb:dotchatbot"
 [tool.mypy]
 allow_redefinition = true
 disallow_untyped_defs = true
+namespace_packages = true
+explicit_package_bases = true

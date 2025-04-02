@@ -49,7 +49,7 @@ lint:
 # Use mypy to check type hints
 .PHONY: check
 check:
-	mypy --namespace-packages --explicit-package-bases .
+	mypy .
 
 .PHONY: verify
 verify: clean install lint check test

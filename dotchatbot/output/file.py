@@ -9,6 +9,8 @@ from typing_extensions import Buffer
 from dotchatbot.client.services import ServiceClient
 from dotchatbot.input.transformer import Message
 
+NEW_USER_MESSAGE = "@@> user:\n\n"
+
 OutputRenderer = Callable[[List[Message]], str]
 
 
