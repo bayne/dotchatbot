@@ -25,10 +25,6 @@ build:
 run:
 	$(PYTHON) dotchatbot/dcb.py $(RUN_ARGS)
 
-.PHONY: entry
-entry:
-	$(ENTRY_COMMAND)
-
 # Clean build and dist directories
 .PHONY: clean
 clean:
@@ -47,12 +43,12 @@ lint:
 	flake8 .
 
 # Use mypy to check type hints
-.PHONY: check
-check:
+.PHONY: type-check
+type-check:
 	mypy .
 
 .PHONY: verify
-verify: clean install lint check test
+verify: clean install lint type-check test
 
 .PHONY: publish-test
 publish-test:
