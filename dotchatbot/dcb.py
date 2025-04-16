@@ -191,7 +191,13 @@ The prompt to use for the summary (for building the filename for the session)\
     option("--markdown-code-theme", default="monokai"),
     option("--markdown-hyperlinks", is_flag=True, default=False),
     option("--markdown-inline-code-lexer"),
-    option("--markdown-inline-code-theme")
+    option("--markdown-inline-code-theme"),
+    option(
+        "--markdown-max-width",
+        type=int,
+        default=125,
+        help="Maximum width of the output"
+    )
 )
 def dotchatbot(
     filename: Optional[str],
@@ -215,7 +221,8 @@ def dotchatbot(
     markdown_code_theme: str,
     markdown_hyperlinks: bool,
     markdown_inline_code_lexer: str,
-    markdown_inline_code_theme: str
+    markdown_inline_code_theme: str,
+    markdown_max_width: Optional[int] = None
 ) -> None:
     """
     Starts a session with the chatbot, resume by providing FILENAME.
@@ -251,7 +258,8 @@ def dotchatbot(
         markdown_code_theme,
         markdown_hyperlinks,
         markdown_inline_code_lexer,
-        markdown_inline_code_theme
+        markdown_inline_code_theme,
+        markdown_max_width
     )
 
     messages = []

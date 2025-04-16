@@ -72,11 +72,12 @@ Anthropic options:
 
 Markdown options:
   --markdown-justify [default|left|center|right|full]
-                              [default: default]
-  --markdown-code-theme TEXT  [default: monokai]
+                                [default: default]
+  --markdown-code-theme TEXT    [default: monokai]
   --markdown-hyperlinks
   --markdown-inline-code-lexer TEXT
   --markdown-inline-code-theme TEXT
+  --markdown-max-width INTEGER  Maximum width of the output  [default: 125]
 
 Other options:
   -C, --config CONFIG_PATH  Location of the configuration file. Supports glob
