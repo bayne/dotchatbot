@@ -40,7 +40,7 @@ more-itertools==10.6.0
 mypy==1.15.0
 mypy-extensions==1.0.0
 nh3==0.2.21
-openai==1.66.5
+openai==1.75.0
 packaging==24.2
 pipx==1.7.1
 platformdirs==4.3.6
