@@ -261,103 +261,107 @@ def dotchatbot(
         markdown_inline_code_theme,
         markdown_max_width
     )
-
-    messages = []
-    if filename == "-":
-        if os.path.exists(session_history_file):
-            with open(session_history_file, "r") as f:
-                lines = f.readlines()
-                if lines:
-                    filename = lines[-1].strip()
-                    click.echo(
-                        f"Resuming from previous session: {filename}",
-                        file=sys.stderr
-                    )
-                else:
-                    filename = None
-        else:
-            filename = None
-
     parser = Parser()
 
-    if filename and os.path.exists(filename):
-        with open(filename, "r") as f:
-            messages = parser.parse(f.read())
+    prompt = True
+    while prompt:
+        messages = []
+        if filename == "-":
+            if os.path.exists(session_history_file):
+                with open(session_history_file, "r") as f:
+                    lines = f.readlines()
+                    if lines:
+                        filename = lines[-1].strip()
+                        click.echo(
+                            f"Resuming from previous session: {filename}",
+                            file=sys.stderr
+                        )
+                    else:
+                        filename = None
+            else:
+                filename = None
 
-    if sys.stdin.isatty():
-        if not reverse:
-            file_content = generate_file_content(messages)
-            file_content = _edit(
-                text=f"{file_content}{NEW_USER_MESSAGE}",
-                extension=session_file_ext,
-                reverse=reverse
-            )
-            messages = parser.parse(file_content)
+        if filename and os.path.exists(filename):
+            with open(filename, "r") as f:
+                messages = parser.parse(f.read())
+
+        if sys.stdin.isatty():
+            if not reverse:
+                file_content = generate_file_content(messages)
+                file_content = _edit(
+                    text=f"{file_content}{NEW_USER_MESSAGE}",
+                    extension=session_file_ext,
+                    reverse=reverse
+                )
+                messages = parser.parse(file_content)
+            else:
+                reversed_messages_from_file = list(reversed(messages))
+                file_content = generate_file_content(
+                    reversed_messages_from_file)
+                file_content = _edit(
+                    text=f"{NEW_USER_MESSAGE}{file_content}",
+                    extension=session_file_ext,
+                    reverse=reverse
+                )
+                messages = list(reversed(parser.parse(file_content)))
         else:
-            reversed_messages_from_file = list(reversed(messages))
-            file_content = generate_file_content(reversed_messages_from_file)
-            file_content = _edit(
-                text=f"{NEW_USER_MESSAGE}{file_content}",
-                extension=session_file_ext,
-                reverse=reverse
-            )
-            messages = list(reversed(parser.parse(file_content)))
-    else:
-        messages = [*messages, *parser.parse(sys.stdin.read())]
+            messages = [*messages, *parser.parse(sys.stdin.read())]
 
-    is_empty_message = (
-        not messages
-        or not messages[-1].content.strip()
-        or messages[-1].role != "user"
-    )
-    if is_empty_message:
-        raise UsageError("Aborting request due to empty message")
-
-    chatbot_response = client.create_chat_completion(messages)
-    messages.append(chatbot_response)
-
-    if no_rich or not sys.stdout.isatty():
-        output = chatbot_response.content
-    else:
-        output = markdown_renderer.render(chatbot_response)
-
-    if no_pager or not sys.stdout.isatty():
-        click.echo(output)
-    else:
-        click.echo(output)
-        click.echo_via_pager(output, color=True)
-
-    if prompt_user:
-        result = click.prompt(
-            "Save response?",
-            default="Y",
-            type=Choice(["y", "n", "c"], case_sensitive=False),
-            show_choices=True
+        is_empty_message = (
+            not messages
+            or not messages[-1].content.strip()
+            or messages[-1].role != "user"
         )
-        save = result.lower() in ("y", "yes", "c")
-        current_directory = current_directory or result.lower() == "c"
-    elif assume_yes:
-        save = True
-    else:
-        save = False
+        if is_empty_message:
+            raise UsageError("Aborting request due to empty message")
 
-    if not filename and save:
-        filename = generate_filename(
-            client, summary_prompt, messages, session_file_ext
-        )
-        if current_directory:
-            filename = os.path.join(os.curdir, filename)
+        chatbot_response = client.create_chat_completion(messages)
+        messages.append(chatbot_response)
+
+        if no_rich or not sys.stdout.isatty():
+            output = chatbot_response.content
         else:
-            filename = os.path.join(session_file_location, filename)
+            output = markdown_renderer.render(chatbot_response)
 
-    if filename and save:
-        with open(filename, "w") as f:
-            f.write(generate_file_content(messages))
-            session_file_absolute_path = os.path.abspath(f.name)
-        click.echo(f"Saved to {filename}", file=sys.stderr)
-        open(session_history_file, "a").write(
-            session_file_absolute_path + "\n"
-        )
+        if no_pager or not sys.stdout.isatty():
+            click.echo(output)
+        else:
+            click.echo(output)
+            click.echo_via_pager(output, color=True)
+
+        if prompt_user:
+            result = click.prompt(
+                "Save response?",
+                default="Y",
+                type=Choice(["y", "n", "c"], case_sensitive=False),
+                show_choices=True
+            )
+            save = result.lower() in ("y", "yes", "c")
+            prompt = result.lower() == "c"
+        elif assume_yes:
+            save = True
+            prompt = False
+        else:
+            save = False
+            prompt = False
+
+        if not filename and save:
+            filename = generate_filename(
+                client, summary_prompt, messages, session_file_ext
+            )
+            if current_directory:
+                filename = os.path.join(os.curdir, filename)
+            else:
+                filename = os.path.join(session_file_location, filename)
+
+        if filename and save:
+            with open(filename, "w") as f:
+                f.write(generate_file_content(messages))
+                session_file_absolute_path = os.path.abspath(f.name)
+            click.echo(f"Saved to {filename}", file=sys.stderr)
+            open(session_history_file, "a").write(
+                session_file_absolute_path + "\n"
+            )
 
 
 if __name__ == "__main__":
