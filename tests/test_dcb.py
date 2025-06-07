@@ -100,7 +100,8 @@ def test_dcb_valid_execution(
         api_key='fake_api_key',
         openai_model='gpt-4o',
         anthropic_model='claude-3-7-sonnet-latest',
-        anthropic_max_tokens=16384
+        anthropic_max_tokens=16384,
+        google_model='gemini-2.5-flash-preview-05-20'
     )
 
 

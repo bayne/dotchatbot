@@ -58,7 +58,7 @@ Options:
                                 the filename for the session)  [default: Given
                                 the conversation so far, summarize it in just 4
                                 words. Only respond with these 4 words]
-  -s, --service-name [OpenAI|Anthropic]
+  -s, --service-name [OpenAI|Anthropic|Google]
                                 The chatbot provider service name  [default:
                                 OpenAI]
   -H, --history                 Print history of sessions
@@ -69,6 +69,9 @@ OpenAI options:
 Anthropic options:
   --anthropic-model TEXT          [default: claude-3-7-sonnet-latest]
   --anthropic-max-tokens INTEGER  [default: 16384]
+
+Google options:
+  --google-model TEXT  [default: gemini-2.5-flash-preview-05-20]
 
 Markdown options:
   --markdown-justify [default|left|center|right|full]

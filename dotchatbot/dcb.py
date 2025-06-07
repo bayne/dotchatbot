@@ -182,6 +182,11 @@ The prompt to use for the summary (for building the filename for the session)\
     )
 )
 @option_group(
+    "Google options", option(
+        "--google-model", default="gemini-2.5-flash-preview-05-20"
+    )
+)
+@option_group(
     "Markdown options",
     option(
         "--markdown-justify",
@@ -217,6 +222,7 @@ def dotchatbot(
     openai_model: ChatModel,
     anthropic_model: ModelParam,
     anthropic_max_tokens: int,
+    google_model: str,
     markdown_justify: JustifyMethod,
     markdown_code_theme: str,
     markdown_hyperlinks: bool,
@@ -251,7 +257,8 @@ def dotchatbot(
         api_key=api_key,
         openai_model=openai_model,
         anthropic_model=anthropic_model,
-        anthropic_max_tokens=anthropic_max_tokens
+        anthropic_max_tokens=anthropic_max_tokens,
+        google_model=google_model,
     )
     markdown_renderer = Renderer(
         markdown_justify,
