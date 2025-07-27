@@ -64,19 +64,23 @@ Options:
   --summary-service-name [OpenAI|Anthropic|Google]
                                 The chatbot provider service name for filename
                                 generation  [default: OpenAI]
+  --quick-service-name TEXT     Call this model first, then the main model.
   -H, --history                 Print history of sessions
 
 OpenAI options:
   --openai-model TEXT          [default: gpt-4o]
+  --quick-openai-model TEXT    [default: gpt-4o]
   --summary-openai-model TEXT  [default: gpt-4o]
 
 Anthropic options:
   --anthropic-model TEXT          [default: claude-3-7-sonnet-latest]
+  --quick-anthropic-model TEXT    [default: claude-3-sonnet-latest]
   --summary-anthropic-model TEXT  [default: claude-3-sonnet-latest]
   --anthropic-max-tokens INTEGER  [default: 16384]
 
 Google options:
   --google-model TEXT          [default: gemini-2.5-pro]
+  --quick-google-model TEXT    [default: gemini-2.5-flash-lite]
   --summary-google-model TEXT  [default: gemini-2.5-flash-lite]
 
 Markdown options:

@@ -26,6 +26,7 @@ from rich.console import JustifyMethod
 from dotchatbot.client.factory import create_client
 from dotchatbot.client.factory import ServiceName
 from dotchatbot.input.parser import Parser
+from dotchatbot.input.transformer import Message
 from dotchatbot.output.file import generate_file_content
 from dotchatbot.output.file import generate_filename
 from dotchatbot.output.file import NEW_USER_MESSAGE
@@ -84,6 +85,24 @@ def _print_history(session_history_file: str) -> None:
                 if previous != filename:
                     click.echo(f"{mtime} {filename}")
                     previous = filename
+
+
+def _print_response(
+    no_rich: bool,
+    no_pager: bool,
+    chatbot_response: Message,
+    markdown_renderer: Renderer
+) -> None:
+    if no_rich or not sys.stdout.isatty():
+        output = chatbot_response.content
+    else:
+        output = markdown_renderer.render(chatbot_response)
+
+    if no_pager or not sys.stdout.isatty():
+        click.echo(output)
+    else:
+        click.echo(output)
+        click.echo_via_pager(output, color=True)
 
 
 @extra_command(
@@ -167,6 +186,11 @@ The prompt to use for the summary (for building the filename for the session)\
         default="OpenAI",
         type=click.Choice(get_args(ServiceName))
     ), option(
+        "--quick-service-name",
+        help="Call this model first, then the main model.",
+        default=None
+
+    ), option(
         "--history",
         "-H",
         help="Print history of sessions",
@@ -178,12 +202,16 @@ The prompt to use for the summary (for building the filename for the session)\
     "OpenAI options", option(
         "--openai-model", default="gpt-4o"
     ), option(
+        "--quick-openai-model", default="gpt-4o"
+    ), option(
         "--summary-openai-model", default="gpt-4o"
     )
 )
 @option_group(
     "Anthropic options", option(
         "--anthropic-model", default="claude-3-7-sonnet-latest"
+    ), option(
+        "--quick-anthropic-model", default="claude-3-sonnet-latest"
     ), option(
         "--summary-anthropic-model", default="claude-3-sonnet-latest"
     ), option(
@@ -194,8 +222,9 @@ The prompt to use for the summary (for building the filename for the session)\
     "Google options", option(
         "--google-model", default="gemini-2.5-pro"
     ), option(
-        "--summary-google-model",
-        default="gemini-2.5-flash-lite"
+        "--quick-google-model", default="gemini-2.5-flash-lite"
+    ), option(
+        "--summary-google-model", default="gemini-2.5-flash-lite"
     )
 )
 @option_group(
@@ -232,13 +261,17 @@ def dotchatbot(
     history: bool,
     service_name: ServiceName,
     summary_service_name: ServiceName,
+    quick_service_name: Optional[ServiceName],
     openai_model: ChatModel,
     summary_openai_model: ChatModel,
+    quick_openai_model: ChatModel,
     anthropic_model: ModelParam,
     summary_anthropic_model: ModelParam,
+    quick_anthropic_model: ModelParam,
     anthropic_max_tokens: int,
     google_model: str,
     summary_google_model: str,
+    quick_google_model: str,
     markdown_justify: JustifyMethod,
     markdown_code_theme: str,
     markdown_hyperlinks: bool,
@@ -287,6 +320,19 @@ def dotchatbot(
         anthropic_max_tokens=anthropic_max_tokens,
         google_model=summary_google_model,
     )
+
+    quick_client = None
+    if quick_service_name:
+        quick_api_key = _get_api_key(quick_service_name)
+        quick_client = create_client(
+            service_name=quick_service_name,
+            system_prompt=system_prompt,
+            api_key=quick_api_key,
+            openai_model=quick_openai_model,
+            anthropic_model=quick_anthropic_model,
+            anthropic_max_tokens=anthropic_max_tokens,
+            google_model=quick_google_model,
+        )
 
     markdown_renderer = Renderer(
         markdown_justify,
@@ -350,19 +396,20 @@ def dotchatbot(
         if is_empty_message:
             raise UsageError("Aborting request due to empty message")
 
+        if quick_client:
+            quick_chatbot_response = quick_client.create_chat_completion(
+                messages
+            )
+            _print_response(
+                no_rich,
+                no_pager,
+                quick_chatbot_response,
+                markdown_renderer
+            )
         chatbot_response = client.create_chat_completion(messages)
         messages.append(chatbot_response)
 
-        if no_rich or not sys.stdout.isatty():
-            output = chatbot_response.content
-        else:
-            output = markdown_renderer.render(chatbot_response)
-
-        if no_pager or not sys.stdout.isatty():
-            click.echo(output)
-        else:
-            click.echo(output)
-            click.echo_via_pager(output, color=True)
+        _print_response(no_rich, no_pager, chatbot_response, markdown_renderer)
 
         if prompt_user:
             result = click.prompt(
