@@ -402,7 +402,7 @@ def dotchatbot(
             )
             _print_response(
                 no_rich,
-                no_pager,
+                True,
                 quick_chatbot_response,
                 markdown_renderer
             )
