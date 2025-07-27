@@ -20,7 +20,7 @@ extra-platforms==3.1.0
 flake8==7.1.2
 google-auth==2.40.3
 google-genai==1.19.0
-h11==0.14.0
+h11>=0.16.0
 httpcore==1.0.7
 httpx==0.28.1
 id==1.5.0
@@ -61,7 +61,7 @@ pyproject_hooks==1.2.0
 pytest==8.3.5
 PyYAML==6.0.2
 readme_renderer==44.0
-requests==2.32.3
+requests>=2.32.4
 requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.9.4
@@ -72,7 +72,7 @@ tabulate==0.9.0
 tqdm==4.67.1
 twine==6.1.0
 typing_extensions==4.12.2
-urllib3==2.3.0
+urllib3>=2.5.0
 userpath==1.9.2
 wcmatch==10.0
 wcwidth==0.2.13
