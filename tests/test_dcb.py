@@ -93,15 +93,15 @@ def test_dcb_valid_execution(
     )
     # assert result.exit_code == 0
     assert "Saved to" in result.output
-    mock_get_api_key.assert_called_once_with('OpenAI')
-    mock_create_client.assert_called_once_with(
+    mock_get_api_key.assert_called_with('OpenAI')
+    mock_create_client.assert_called_with(
         service_name='OpenAI',
         system_prompt='You are a helpful assistant.',
         api_key='fake_api_key',
         openai_model='gpt-4o',
-        anthropic_model='claude-3-7-sonnet-latest',
+        anthropic_model='claude-3-sonnet-latest',
         anthropic_max_tokens=16384,
-        google_model='gemini-2.5-flash-preview-05-20'
+        google_model='gemini-2.5-flash-lite'
     )
 
 

@@ -162,6 +162,11 @@ The prompt to use for the summary (for building the filename for the session)\
         default="OpenAI",
         type=click.Choice(get_args(ServiceName))
     ), option(
+        "--summary-service-name",
+        help="The chatbot provider service name for filename generation",
+        default="OpenAI",
+        type=click.Choice(get_args(ServiceName))
+    ), option(
         "--history",
         "-H",
         help="Print history of sessions",
@@ -172,18 +177,25 @@ The prompt to use for the summary (for building the filename for the session)\
 @option_group(
     "OpenAI options", option(
         "--openai-model", default="gpt-4o"
+    ), option(
+        "--summary-openai-model", default="gpt-4o"
     )
 )
 @option_group(
     "Anthropic options", option(
         "--anthropic-model", default="claude-3-7-sonnet-latest"
     ), option(
+        "--summary-anthropic-model", default="claude-3-sonnet-latest"
+    ), option(
         "--anthropic-max-tokens", default=16384, type=int
     )
 )
 @option_group(
     "Google options", option(
-        "--google-model", default="gemini-2.5-flash-preview-05-20"
+        "--google-model", default="gemini-2.5-pro"
+    ), option(
+        "--summary-google-model",
+        default="gemini-2.5-flash-lite"
     )
 )
 @option_group(
@@ -219,10 +231,14 @@ def dotchatbot(
     summary_prompt: str,
     history: bool,
     service_name: ServiceName,
+    summary_service_name: ServiceName,
     openai_model: ChatModel,
+    summary_openai_model: ChatModel,
     anthropic_model: ModelParam,
+    summary_anthropic_model: ModelParam,
     anthropic_max_tokens: int,
     google_model: str,
+    summary_google_model: str,
     markdown_justify: JustifyMethod,
     markdown_code_theme: str,
     markdown_hyperlinks: bool,
@@ -260,6 +276,18 @@ def dotchatbot(
         anthropic_max_tokens=anthropic_max_tokens,
         google_model=google_model,
     )
+
+    summary_api_key = _get_api_key(summary_service_name)
+    summary_client = create_client(
+        service_name=summary_service_name,
+        system_prompt=system_prompt,
+        api_key=summary_api_key,
+        openai_model=summary_openai_model,
+        anthropic_model=summary_anthropic_model,
+        anthropic_max_tokens=anthropic_max_tokens,
+        google_model=summary_google_model,
+    )
+
     markdown_renderer = Renderer(
         markdown_justify,
         markdown_code_theme,
@@ -354,7 +382,7 @@ def dotchatbot(
 
         if not filename and save:
             filename = generate_filename(
-                client, summary_prompt, messages, session_file_ext
+                summary_client, summary_prompt, messages, session_file_ext
             )
             if current_directory:
                 filename = os.path.join(os.curdir, filename)
